@@ -692,8 +692,20 @@ class MainContent(QObject):
                     f"Deleting SteamCMD ACF data: {self.steamcmd_wrapper.steamcmd_appworkshop_acf_path}"
                 )
                 os.remove(self.steamcmd_wrapper.steamcmd_appworkshop_acf_path)
+                diag = dialogue.BinaryChoiceDialog(
+                    title="acf Deleted",
+                    text="acf deleted, Do you want to refresh mods window.",
+                    positive_text="Refresh mods window",
+                    negative_text="Ok",
+                )
+                if diag.exec_is_positive():
+                    self._do_refresh()
             else:
                 logger.debug("SteamCMD ACF data does not exist. Skipping action.")
+                dialogue.show_information(
+                    title="acf file not found",
+                    text="acf file does not exist or is already deleted..",
+                )
         if action == "update_workshop_mods":
             self._do_check_for_workshop_updates()
         if action == "import_list_file_xml":
@@ -2050,8 +2062,7 @@ class MainContent(QObject):
                     )
                     self.steamworks_in_use = False
                 elif (
-                    instruction[0] in subscription_actions
-                    and len(instruction[1]) >= 1
+                    instruction[0] in subscription_actions and len(instruction[1]) >= 1
                 ):  # ISteamUGC/{SubscribeItem/UnsubscribeItem}
                     logger.info(
                         f"Creating Steamworks API process with instruction {instruction}"
